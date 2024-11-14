@@ -21,8 +21,8 @@ def print_balance_slip(current_user):
                     output_file.write(f"Balance: {current_user["amount"]}\n\n")
                     output_file.write(f"Date: {get_current_time()}")
 
-            except:
-                pass
+            except Exception as e:
+                print(f"An error occurred: {e}")
 def print_transfer_slip(current_user, recipient, amount):
         file_name = f"transfer_slip_{current_user["f_name"]}_{current_user["l_name"]}"
 
@@ -42,8 +42,8 @@ def print_transfer_slip(current_user, recipient, amount):
                     output_file.write(f"Balance: {current_user["amount"]}\n\n")
                     output_file.write(f"Date: {get_current_time()}")
 
-            except:
-                pass
+            except Exception as e:
+                print(f"An error occurred: {e}")
 
 def print_deposit_slip(current_user, amount):
         file_name = f"deposit_slip_{current_user["f_name"]}_{current_user["l_name"]}"
@@ -62,8 +62,8 @@ def print_deposit_slip(current_user, amount):
                     output_file.write(f"Balance: {current_user["amount"]}\n\n")
                     output_file.write(f"Date: {get_current_time()}")
 
-            except:
-                pass
+            except Exception as e:
+                print(f"An error occurred: {e}")
 
 def print_withdrawal_slip(current_user, amount):
         file_name = f"withdrawal_slip_{current_user["f_name"]}_{current_user["l_name"]}"
@@ -82,5 +82,34 @@ def print_withdrawal_slip(current_user, amount):
                     output_file.write(f"Balance: {current_user["amount"]}\n\n")
                     output_file.write(f"Date: {get_current_time()}")
 
-            except:
-                pass
+            except Exception as e:
+                print(f"An error occurred: {e}")
+
+def print_transaction_history(current_user):
+     
+     file_name = f"transaction_history_{current_user["f_name"]}_{current_user["l_name"]}"
+     
+     file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt")], initialfile=file_name)
+     if file_path:
+        try:
+            with open(file_path, "w") as output_file:
+                # Header
+                output_file.write("Transaction History\n")
+                output_file.write("=" * 50 + "\n\n")
+                output_file.write(f"Name: {current_user['f_name']} {current_user['l_name']}\n")
+                output_file.write(f"Account Number: {current_user['account_no']}\n\n")
+                
+                # Column Titles
+                output_file.write(f"{'Date':<20}{'Description':<20}{'Amount':>10}\n")
+                output_file.write("-" * 50 + "\n")
+                
+                # Transaction History
+                for each in current_user["transaction_history"]:
+                    date, description, amount = each[1], each[0], each[2]
+                    output_file.write(f"{date:<20}{description:<20}{amount:>10.2f}\n")
+                
+                # Success message (Optional for internal use)
+                print("Transaction history saved successfully!")
+
+        except Exception as e:
+            print(f"An error occurred: {e}")

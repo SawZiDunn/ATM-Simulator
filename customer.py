@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import pickle
 from tkinter import messagebox, ttk
-from utils import get_current_time
+import utils
 
 class BasePage:
     def __init__(self, master, title):
@@ -19,7 +19,7 @@ class BasePage:
         ctk.set_appearance_mode("light")
         ctk.set_default_color_theme("green")
 
-        self.label = ctk.CTkLabel(master, text="Ladkrabang Bank ATM", font=("Helvetica", 30, "bold"))
+        self.label = ctk.CTkLabel(master, text="Ladkrabang Bank ATM", font=("Helvetica", 50, "bold"))
         self.label.pack(pady=25)
 
 
@@ -174,7 +174,7 @@ class Balance(BasePage):
         ctk.CTkButton(
             button_frame, 
             text="Print Balance Receipt", 
-            command=self.print_balance_slip,
+            command=lambda: self.print_balance_slip(current_user),
             width=90, height=35
         ).grid(row=0, column=1, padx=10)
         
@@ -232,6 +232,8 @@ class Deposit(BasePage):
         self.back_button = ctk.CTkButton(master, text="Back", command=self.go_back)
         self.back_button.pack()
 
+    
+
     def set_amount(self, amt):
         self.amount_entry.delete(0, ctk.END)
         self.amount_entry.insert(0, amt)
@@ -239,10 +241,15 @@ class Deposit(BasePage):
     def deposit(self):
         amount = float(self.amount_entry.get())
         self.current_user['amount'] += amount
-        text = ("Deposit", get_current_time(), +amount)
+        text = ("Deposit", utils.get_current_time(), +amount)
         self.current_user["transaction_history"].append(text)
         messagebox.showinfo("Deposit Success", f"${amount} deposited successfully.")
         self.save_data()
+
+        result = messagebox.askyesno("Get Deposit Slip", "Would you like to take deposit slip?")
+        if result:
+            utils.print_deposit_slip(self.current_user, amount)
+
         self.go_back()
 
     def go_back(self):
@@ -305,10 +312,13 @@ class Withdraw(BasePage):
         if amount <= self.current_user['amount']:
             self.current_user['amount'] -= amount
             # transactin history logic
-            text = ("Withdrawal", get_current_time(), +amount)
+            text = ("Withdrawal", utils.get_current_time(), +amount)
             self.current_user["transaction_history"].append(text)
             messagebox.showinfo("Withdraw Success", f"${amount} withdrawn successfully.")
             self.save_data()
+            result = messagebox.askyesno("Get Withdrawal Slip", "Would you like to take withdrawal slip?")
+            if result:
+                utils.print_withdrawal_slip(self.current_user, amount)
             self.go_back()
         else:
             messagebox.showerror("Insufficient Funds", "Not enough balance.")
@@ -367,18 +377,12 @@ class TransactionHistory(BasePage):
         back_button = ctk.CTkButton(button_frame, text="Back to Menu", command=self.go_back)
         back_button.grid(row=0, column=0, padx=10)
 
-        print_button = ctk.CTkButton(button_frame, text="Print Transaction History", command=self.print_history)
+        print_button = ctk.CTkButton(button_frame, text="Print Transaction History", command=lambda: utils.print_transaction_history(self.current_user))
         print_button.grid(row=0, column=1, padx=10)
 
     def go_back(self):
         self.master.destroy()
         self.parent.deiconify()
-
-    def print_history(self):
-        # Simple print function, can be extended to save a file
-        print("Printing Transaction History...")
-        for transaction in self.db["transaction_history"]:
-            print(f"{transaction[0]} - {transaction[1]} - ${transaction[2]:,.2f}")
 
 
 class Transfer(BasePage):
@@ -453,14 +457,18 @@ class Transfer(BasePage):
                 recipient['amount'] += amount
                 # transaction history logic
                 # for current_user
-                text = (f"Transfer to {recipient["f_name"]} {recipient["l_name"]}", get_current_time(), -amount)
+                text = (f"Transfer to {recipient["f_name"]} {recipient["l_name"]}", utils.get_current_time(), -amount)
                 self.current_user["transaction_history"].append(text)
                 # for recipient
-                text = (f"Transfer from {self.current_user["f_name"]} {self.current_user["l_name"]}", get_current_time(), amount)
+                text = (f"Transfer from {self.current_user["f_name"]} {self.current_user["l_name"]}", utils.get_current_time(), amount)
                 recipient["transaction_history"].append(text)
 
                 messagebox.showinfo("Transfer Success", f"${amount} transferred to {recipient_account}.")
                 self.save_data()
+
+                result = messagebox.askyesno("Get Transfer Slip", "Would you like to take transfer slip?")
+                if result:
+                    utils.print_transfer_slip(self.current_user, recipient, amount)
                 self.go_to_main_menu()
 
             else:
