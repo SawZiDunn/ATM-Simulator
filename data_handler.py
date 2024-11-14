@@ -7,13 +7,12 @@ class DataHandler:
         self._customers = self.load_data(DATA_FILE)
 
     def save_data(self, data):
-        """Save data to the file and update the in-memory cache."""
+
         with open(DATA_FILE, 'wb') as file:
             pickle.dump(data, file)
         self._customers = data  # Update in-memory data
 
     def load_data(self, filename):
-        """Load data from the file."""
         try:
             with open(filename, 'rb') as file:
                 return pickle.load(file)
@@ -21,7 +20,6 @@ class DataHandler:
             return []
 
     def get_customers(self):
-   
         return self._customers
     
     def password_exists(self, password):
@@ -39,7 +37,6 @@ class DataHandler:
         return False
 
     def refresh_customers(self):
-        """Reload customers from file to refresh the in-memory data."""
         self._customers = self.load_data(DATA_FILE)
 
 db = DataHandler()

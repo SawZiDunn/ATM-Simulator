@@ -2,11 +2,11 @@ import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk, messagebox
 import sys
-from CTkMessagebox import CTkMessagebox
 from customer import BasePage
 from data_handler import DataHandler
 import config
 import random
+
 
 class AdminLoginPage(BasePage):
     def __init__(self, master):
@@ -42,10 +42,10 @@ class AdminLoginPage(BasePage):
 
             # master is log_in_page
             self.master.withdraw()
-            self.admin_menu = ctk.CTkToplevel(self.master)
-            AdminMenu(self.admin_menu, db, data_handler)
+            admin_menu = ctk.CTkToplevel(self.master)
+            AdminMenu(admin_menu, db, data_handler)
         else:
-            CTkMessagebox(title="Log In Failed!", message="Invalid Email or Password!\nPlease try again!")
+            messagebox.showerror(title="Log In Failed!", message="Invalid Email or Password!\nPlease try again!")
 
 
 class AdminMenu(BasePage):
@@ -71,17 +71,17 @@ class AdminMenu(BasePage):
 
     def register_customer(self):
         self.master.withdraw()
-        self.register_window = ctk.CTkToplevel(self.master)
-        RegisterCustomer(self.register_window, self.db, self.data_handler)
-
+        register_window = ctk.CTkToplevel(self.master)
+        RegisterCustomer(register_window, self.db, self.data_handler)
 
     def view_customer(self):
         self.master.withdraw()
-        self.view_customer_window = ctk.CTkToplevel(self.master)
-        ViewCustomer(self.view_customer_window, self.data_handler)
+        view_customer_window = ctk.CTkToplevel(self.master)
+        ViewCustomer(view_customer_window, self.data_handler)
 
     def exit_customer(self):
         sys.exit()
+
 
 class RegisterCustomer(BasePage):
     def __init__(self, master, db, data_handler) -> None:
@@ -103,34 +103,36 @@ class RegisterCustomer(BasePage):
         self.input_frame = ctk.CTkFrame(master, fg_color="transparent")
         self.input_frame.pack(pady=10)
 
-        self.account_no_label = ctk.CTkLabel(self.input_frame, text="Account Number: ", font=("Helvetica", 25))
+        self.account_no_label = ctk.CTkLabel(self.input_frame, text="Account Number: ", font=("Helvetica", 25), anchor="e")
         self.account_no_label.grid(row=1, column=1, padx=10, pady=10)
-        self.account_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.account_no, state="disabled")
+        self.account_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.account_no, state="disabled", width=200)
         self.account_entry.grid(row=1, column=2, padx=10, pady=10)
 
-        self.password_label = ctk.CTkLabel(self.input_frame, text="Password: ", font=("Helvetica", 25))
+        self.password_label = ctk.CTkLabel(self.input_frame, text="Password: ", font=("Helvetica", 25), anchor="e")
         self.password_label.grid(row=2, column=1, padx=10, pady=10)
-        self.password_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.password)
+        self.password_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.password, width=200)
         self.password_entry.grid(row=2, column=2, padx=10, pady=10)
 
-        self.fname_label = ctk.CTkLabel(self.input_frame, text="First Name: ", font=("Helvetica", 25))
+        self.fname_label = ctk.CTkLabel(self.input_frame, text="First Name: ", font=("Helvetica", 25), anchor="e")
         self.fname_label.grid(row=3, column=1, padx=10, pady=10)
-        self.fname_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.f_name)
+        self.fname_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.f_name, width=200)
         self.fname_entry.grid(row=3, column=2, padx=10, pady=10)
 
-        self.lname_label = ctk.CTkLabel(self.input_frame, text="Last Name: ", font=("Helvetica", 25))
+        self.lname_label = ctk.CTkLabel(self.input_frame, text="Last Name: ", font=("Helvetica", 25), anchor="e")
         self.lname_label.grid(row=4, column=1, padx=10, pady=10)
-        self.lname_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.l_name)
+        self.lname_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.l_name, width=200)
         self.lname_entry.grid(row=4, column=2, padx=10, pady=10)
 
-        self.amount_label = ctk.CTkLabel(self.input_frame, text="Initial Amount: ", font=("Helvetica", 25))
+        self.amount_label = ctk.CTkLabel(self.input_frame, text="Initial Amount: ", font=("Helvetica", 25), anchor="e")
         self.amount_label.grid(row=5, column=1, padx=10, pady=10)
-        self.amount_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.amount)
+        self.amount_entry = ctk.CTkEntry(self.input_frame, font=("Helvetica", 18), textvariable=self.amount, width=200)
         self.amount_entry.grid(row=5, column=2, padx=10, pady=10),
 
-        self.register_btn = ctk.CTkButton(master, text="Register", width=300, height=45, font=("Helvetica", 18), command=self.register, state=self.register)
+        self.button_frame = ctk.CTkFrame(master, fg_color="transparent")
+        self.button_frame.pack(padx=10, pady=20)
+        self.register_btn = ctk.CTkButton(self.button_frame, text="Register", width=300, height=45, font=("Helvetica", 18), command=self.register)
         self.register_btn.pack(padx=10, pady=10)
-        self.back_btn = ctk.CTkButton(master, text="Back", width=300, height=45, font=("Helvetica", 18), command=self.main_menu)
+        self.back_btn = ctk.CTkButton(self.button_frame, text="Back", width=300, height=45, font=("Helvetica", 18), command=self.main_menu)
         self.back_btn.pack(padx=10, pady=10)
 
     def register(self):
@@ -142,11 +144,11 @@ class RegisterCustomer(BasePage):
         
         if self.password.get() and self.f_name.get() and self.l_name.get():
 
-            new_customer = {"account_no": self.account_no.get(), "password": self.password.get(), "f_name": self.f_name.get(), "l_name": self.l_name.get(), "amount": self.amount.get(), "transaction_history": list(),"status": True}
+            new_customer = {"account_no": self.account_no.get(), "password": self.password.get(), "f_name": self.f_name.get(), "l_name": self.l_name.get(), "amount": self.amount.get(), "transaction_history": list(), "status": True}
             self.db.append(new_customer)
             self.data_handler.save_data(self.db)
 
-            CTkMessagebox(message="A new customer is registered succesfully!")
+            messagebox.showinfo(message="A new customer is registered succesfully!")
             self.main_menu()
         else:
             messagebox.showerror("Empty Field Exists!", message="Please fill all the empty fields.")
@@ -163,11 +165,19 @@ class ViewCustomer(BasePage):
 
         headers = ["NO", "Account Number", "Password", "First Name", "Last Name", "Amount", "Status", "Actions"]
 
-        self.list_frame = ctk.CTkFrame(master, width=900)
+        self.topic = ctk.CTkLabel(master, text="Customer Management", font=("Helvetica", 25))
+        self.topic.pack(pady=25)
+
+        self.list_frame = ctk.CTkFrame(master, width=1200)
         self.list_frame.pack(pady=10, padx=10)
 
         scrollbar = ttk.Scrollbar(self.list_frame, orient=tk.VERTICAL)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        style = ttk.Style()
+        style.configure("Treeview", font=("Helvetica", 17), rowheight=30)  # Set row font size and height
+        style.configure("Treeview.Heading", font=("Helvetica", 18, "bold"))
+        style.configure("Treeview", rowheight=40)
 
         self.tree = ttk.Treeview(self.list_frame, columns=headers, show='headings', height=10, yscrollcommand=scrollbar.set)
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -176,13 +186,13 @@ class ViewCustomer(BasePage):
             self.tree.heading(header, text=header)
             self.tree.column(header, width=100, anchor=tk.CENTER)
 
-        self.tree.column("Account Number", width=150)
+        self.tree.column("Account Number", width=200)
         self.tree.column("Password", width=150)
         self.tree.column("First Name", width=150)
         self.tree.column("Last Name", width=150)
-        self.tree.column("Amount", width=100)
-        self.tree.column("Status", width=100)
-        self.tree.column("Actions", width=200)
+        self.tree.column("Amount", width=150)
+        self.tree.column("Status", width=150)
+        self.tree.column("Actions", width=180)
 
         self.tree.bind("<Button-1>", self.handle_click)  # Handle clicks on action links
 
@@ -191,23 +201,24 @@ class ViewCustomer(BasePage):
         button_frame = ctk.CTkFrame(master, fg_color="transparent")
         button_frame.pack(pady=10)
 
-        return_btn = ctk.CTkButton(button_frame, text="Back", width=200, height=40, font=("Helvetica", 12), command=self.main_menu)
+        return_btn = ctk.CTkButton(button_frame, text="Back", width=300, height=40, font=("Helvetica", 18), command=self.main_menu)
         return_btn.pack(side=tk.LEFT, padx=10)
 
-        refresh_btn = ctk.CTkButton(button_frame, text="Refresh", width=200, height=40, font=("Helvetica", 12), command=self.refresh_customers)
+        refresh_btn = ctk.CTkButton(button_frame, text="Refresh", width=300, height=40, font=("Helvetica", 18), command=self.refresh_customers)
         refresh_btn.pack(side=tk.LEFT, padx=10)
 
     def load_customers(self):
-        """Load customers and add Edit/Delete links."""
+     
         self.data_handler.refresh_customers()
         customers = self.data_handler.get_customers()
+
         for index, customer in enumerate(customers, start=1):
             status = "Active" if customer["status"] else "Locked"
             values = (index, customer["account_no"], customer["password"], customer["f_name"], customer["l_name"], customer["amount"], status, "Edit | Delete")
             self.tree.insert('', tk.END, values=values)
 
     def handle_click(self, event):
-        """Handle click events on Treeview items."""
+   
         region = self.tree.identify("region", event.x, event.y)
         if region == "cell":
             col = int(self.tree.identify_column(event.x).replace("#", ""))
@@ -216,53 +227,54 @@ class ViewCustomer(BasePage):
                 self.open_action_menu(row_id)
 
     def open_action_menu(self, row_id):
-        """Determine whether to edit or delete based on click position."""
         action_popup = tk.Menu(self.tree, tearoff=0)
-        action_popup.add_command(label="Edit", command=lambda: self.edit_customer(row_id))
-        action_popup.add_command(label="Delete", command=lambda: self.confirm_delete(row_id))
+        font_style = (("Helvetica", 16))
+        action_popup.add_command(label="Edit", command=lambda: self.edit_customer(row_id), font=font_style)
+        action_popup.add_command(label="Delete", command=lambda: self.confirm_delete(row_id), font=font_style)
         action_popup.post(self.tree.winfo_pointerx(), self.tree.winfo_pointery())
 
     def refresh_customers(self):
-        """Reload the customer list."""
+
         self.data_handler.refresh_customers()
         self.tree.delete(*self.tree.get_children())
         self.load_customers()
 
     def edit_customer(self, row_id):
-        """Open an Edit Customer window."""
         customer_data = self.tree.item(row_id)["values"]
         account_no, password, f_name, l_name, amount, status = customer_data[1:7]
         status_bool = (status == "Active")
 
         edit_window = ctk.CTkToplevel(self.master)
         edit_window.title("Edit Customer")
+        edit_window.geometry("350x300")
+        edit_window.resizable(False, False)
 
         ctk.CTkLabel(edit_window, text="Account Number").grid(row=0, column=0, padx=10, pady=5)
-        acc_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=account_no), state="disabled")
+        acc_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=account_no), state="disabled", width=200)
         acc_entry.grid(row=0, column=1)
 
-        ctk.CTkLabel(edit_window, text="Password").grid(row=1, column=0)
-        pass_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=password))
+        ctk.CTkLabel(edit_window, text="Password").grid(row=1, column=0, pady=5)
+        pass_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=password), width=200)
         pass_entry.grid(row=1, column=1)
 
-        ctk.CTkLabel(edit_window, text="First Name").grid(row=2, column=0)
-        first_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=f_name))
+        ctk.CTkLabel(edit_window, text="First Name").grid(row=2, column=0, pady=5)
+        first_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=f_name), width=200)
         first_entry.grid(row=2, column=1)
 
-        ctk.CTkLabel(edit_window, text="Last Name").grid(row=3, column=0)
-        last_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=l_name))
+        ctk.CTkLabel(edit_window, text="Last Name").grid(row=3, column=0, pady=5)
+        last_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=l_name), width=200)
         last_entry.grid(row=3, column=1)
 
-        ctk.CTkLabel(edit_window, text="Amount").grid(row=4, column=0)
-        amount_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=amount))
+        ctk.CTkLabel(edit_window, text="Amount").grid(row=4, column=0, pady=5)
+        amount_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=amount), width=200)
         amount_entry.grid(row=4, column=1)
 
-        ctk.CTkLabel(edit_window, text="Status").grid(row=5, column=0)
+        ctk.CTkLabel(edit_window, text="Status").grid(row=5, column=0, pady=5)
         status_check = ctk.CTkCheckBox(edit_window, text="", variable=tk.BooleanVar(value=status_bool))
         status_check.grid(row=5, column=1)
 
         save_btn = ctk.CTkButton(edit_window, text="Save", command=lambda: self.save_changes(row_id, pass_entry.get(), first_entry.get(), last_entry.get(), amount_entry.get(), status_check.get(), edit_window))
-        save_btn.grid(row=6, column=0, columnspan=2, pady=10)
+        save_btn.grid(row=6, column=0, columnspan=2, pady=20)
 
     def save_changes(self, row_id, password, f_name, l_name, amount, status, edit_window):
         """Save edited customer data."""
@@ -300,6 +312,7 @@ class ViewCustomer(BasePage):
         """Return to the main menu."""
         self.master.destroy()
         self.master.master.deiconify()
+
 
 root = ctk.CTk()
 AdminLoginPage(root)
