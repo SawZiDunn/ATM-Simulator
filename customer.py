@@ -1,8 +1,8 @@
 import customtkinter as ctk
-import pickle
 from tkinter import messagebox, ttk
 import utils
 from data_handler import DataHandler
+import sys
 
 class BasePage:
     def __init__(self, master, title):
@@ -78,6 +78,12 @@ class UserMenu(BasePage):
         self.intro = ctk.CTkLabel(master, text=f"Hello, {current_user["f_name"]} {current_user["l_name"]}", font=("Helvetica", 25), width=200)
         self.intro.pack(pady=10)
 
+        text = "Your account is locked!\nYou wont be able to make transactions!\nPlease contact our back for further information."
+        self.locked_acc_message = ctk.CTkLabel(master, text=text, font=("Helvetica", 22, "bold"), text_color="red", width=200)
+        if not current_user["status"]:
+            self.locked_acc_message.pack(pady=10)
+        
+
         # frame to hold 4 buttons
         self.button_frame = ctk.CTkFrame(master, fg_color="transparent")
         self.button_frame.pack(pady=10)
@@ -100,7 +106,7 @@ class UserMenu(BasePage):
         self.logout_button = ctk.CTkButton(master, text="Log Out", font=("Helvetica", 12), width=180, height=35, fg_color="red", command=self.log_out)
         self.logout_button.pack(pady=10)
 
-        self.exit_button = ctk.CTkButton(master, text="Exit", font=("Helvetica", 12), width=180, height=35, fg_color="red", command=master.quit)
+        self.exit_button = ctk.CTkButton(master, text="Exit", font=("Helvetica", 12), width=180, height=35, fg_color="red", command=lambda: sys.exit(1))
         self.exit_button.pack(pady=10)
 
     def show_balance(self):
@@ -109,19 +115,28 @@ class UserMenu(BasePage):
         Balance(balance_window, self.current_user)
 
     def withdraw_money(self):
-        self.master.withdraw()
-        withdraw_window = ctk.CTkToplevel(self.master)
-        Withdraw(withdraw_window, self.current_user, self.db, self.save_data, self.master)
+        if not self.current_user["status"]:
+            messagebox.showwarning("Account Locked!", "Your account is locked!\nYou cannot make withdrawal.")
+        else:
+            self.master.withdraw()
+            withdraw_window = ctk.CTkToplevel(self.master)
+            Withdraw(withdraw_window, self.current_user, self.db, self.save_data, self.master)
 
     def deposit_money(self):
-        self.master.withdraw()
-        deposit_window = ctk.CTkToplevel(self.master)
-        Deposit(deposit_window, self.current_user, self.db, self.save_data, self.master)
+        if not self.current_user["status"]:
+            messagebox.showwarning("Account Locked!", "Your account is locked!\nYou cannot make deposit.")
+        else:
+            self.master.withdraw()
+            deposit_window = ctk.CTkToplevel(self.master)
+            Deposit(deposit_window, self.current_user, self.db, self.save_data, self.master)
 
     def transfer_money(self):
-        self.master.withdraw()
-        self.transfer_window = ctk.CTkToplevel(self.master)
-        Transfer(self.transfer_window, self.current_user, self.db, self.save_data, self.master)
+        if not self.current_user["status"]:
+            messagebox.showwarning("Account Locked!", "Your account is locked!\nYou cannot make transfer.")
+        else:
+            self.master.withdraw()
+            self.transfer_window = ctk.CTkToplevel(self.master)
+            Transfer(self.transfer_window, self.current_user, self.db, self.save_data, self.master)
 
     def show_history(self):
         self.master.withdraw()
@@ -229,7 +244,7 @@ class Deposit(BasePage):
         self.current_user['amount'] += amount
         text = ("Deposit", utils.get_current_time(), amount)
         self.current_user["transaction_history"].append(text)
-        messagebox.showinfo("Deposit Success", f"${amount} deposited successfully.")
+        messagebox.showinfo("Deposit Success", f"{amount} Baht deposited successfully.")
         self.save_data(self.db)
 
         result = messagebox.askyesno("Get Deposit Slip", "Would you like to take deposit slip?")
@@ -300,7 +315,7 @@ class Withdraw(BasePage):
             # transactin history logic
             text = ("Withdrawal", utils.get_current_time(), +amount)
             self.current_user["transaction_history"].append(text)
-            messagebox.showinfo("Withdraw Success", f"${amount} withdrawn successfully.")
+            messagebox.showinfo("Withdraw Success", f"{amount} Baht withdrawn successfully.")
             self.save_data(self.db)
             result = messagebox.askyesno("Get Withdrawal Slip", "Would you like to take withdrawal slip?")
             if result:
@@ -312,66 +327,6 @@ class Withdraw(BasePage):
     def go_back(self):
         self.master.destroy()
         self.parent.deiconify()
-
-class TransactionHistory(BasePage):
-    def __init__(self, master, current_user, db, parent):
-        super().__init__(master, "Transaction History")
-        self.current_user = current_user
-        self.db = db
-        self.parent = parent
-
-        # Title label
-        title_label = ctk.CTkLabel(master, text="Transaction History", font=("Arial", 25, "bold"))
-        title_label.pack(pady=20)
-
-        # Scrollable table for transaction list
-        self.table_frame = ctk.CTkFrame(master, width=1200)
-        self.table_frame.pack(padx=10, pady=10)
-
-        # Add scrollbars
-        self.scrollbar = ttk.Scrollbar(self.table_frame, orient=ctk.VERTICAL)
-        self.scrollbar.pack(side=ctk.RIGHT, fill=ctk.Y)
-        
-
-        self.table = ttk.Treeview(self.table_frame, columns=("Description", "Date", "Amount"), show="headings", height=10, yscrollcommand=self.scrollbar.set)
-        self.table.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
-        self.table.configure(yscrollcommand=self.scrollbar.set)
-
-        style = ttk.Style()
-        style.configure("Treeview", font=("Helvetica", 17), rowheight=30)  # Set row font size and height
-        style.configure("Treeview.Heading", font=("Helvetica", 18, "bold"))
-        style.configure("Treeview", rowheight=40)
-
-        # Set column widths
-        self.table.column("Description", width=300, anchor=ctk.CENTER)
-        self.table.column("Date", width=300, anchor=ctk.CENTER)
-        self.table.column("Amount", width=200, anchor=ctk.CENTER)
-
-        # Set column headings
-        self.table.heading("Description", text="Description")
-        self.table.heading("Date", text="Date")
-        self.table.heading("Amount", text="Amount")
-        
-
-        # Add transactions to the table
-        transaction_history = self.current_user["transaction_history"]
-        for transaction in transaction_history:
-            self.table.insert("", "end", values=(transaction[0], transaction[1], f"{transaction[2]:,.2f} Baht"))
-
-        # Buttons
-        button_frame = ctk.CTkFrame(master, fg_color="transparent")
-        button_frame.pack(pady=10)
-
-        back_button = ctk.CTkButton(button_frame, text="Back to Menu", command=self.go_back, width=300, height=30)
-        back_button.grid(row=0, column=0, padx=10)
-
-        print_button = ctk.CTkButton(button_frame, text="Print Transaction History", command=lambda: utils.print_transaction_history(self.current_user), width=300, height=30)
-        print_button.grid(row=0, column=1, padx=10)
-
-    def go_back(self):
-        self.master.destroy()
-        self.parent.deiconify()
-
 
 class Transfer(BasePage):
     def __init__(self, master, current_user, db, save_data, parent):
@@ -433,12 +388,19 @@ class Transfer(BasePage):
 
     def make_transfer(self):
         recipient_account = self.account_entry.get()
-        amount = float(self.amount_entry.get())
+        try:
+            amount = float(self.amount_entry.get())
+        except ValueError:
+            messagebox.showerror("Invalid Amount", "Please enter a valid numeric amount.")
+            return
+        
         recipient = next((user for user in self.db if user['account_no'] == recipient_account), None)
 
         if recipient:
             if recipient["account_no"] == self.current_user["account_no"]:
                 messagebox.showwarning("Transfer Failed", "You cannot transfer to your own account!")
+            elif amount <=0:
+                messagebox.showerror("Invalid Amount", "Transfer amount must be greater than zero.")
             elif amount <= self.current_user['amount']:
                 self.current_user['amount'] -= amount
                 recipient['amount'] += amount
@@ -450,7 +412,7 @@ class Transfer(BasePage):
                 text = (f"Transfer from {self.current_user["f_name"]} {self.current_user["l_name"]}", utils.get_current_time(), amount)
                 recipient["transaction_history"].append(text)
 
-                messagebox.showinfo("Transfer Success", f"${amount} transferred to {recipient_account}.")
+                messagebox.showinfo("Transfer Success", f"{amount} Baht transferred to Account Number: {recipient_account}.")
                 self.save_data(self.db)
 
                 result = messagebox.askyesno("Get Transfer Slip", "Would you like to take transfer slip?")
@@ -462,3 +424,64 @@ class Transfer(BasePage):
                 messagebox.showerror("Insufficient Funds", "Not enough balance.")
         else:
             messagebox.showerror("Transfer Failed", "Recipient account not found.")
+
+class TransactionHistory(BasePage):
+    def __init__(self, master, current_user, db, parent):
+        super().__init__(master, "Transaction History")
+        self.current_user = current_user
+        self.db = db
+        self.parent = parent
+
+        # Title label
+        title_label = ctk.CTkLabel(master, text="Transaction History", font=("Arial", 25, "bold"))
+        title_label.pack(pady=20)
+
+        # Scrollable table for transaction list
+        self.table_frame = ctk.CTkFrame(master, width=1200)
+        self.table_frame.pack(padx=10, pady=10)
+
+        # Add scrollbars
+        self.scrollbar = ttk.Scrollbar(self.table_frame, orient=ctk.VERTICAL)
+        self.scrollbar.pack(side=ctk.RIGHT, fill=ctk.Y)
+        
+
+        self.table = ttk.Treeview(self.table_frame, columns=("Description", "Date", "Amount"), show="headings", height=10, yscrollcommand=self.scrollbar.set)
+        self.table.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+        self.table.configure(yscrollcommand=self.scrollbar.set)
+
+        style = ttk.Style()
+        style.configure("Treeview", font=("Helvetica", 17), rowheight=70)  # Set row font size and height
+        style.configure("Treeview.Heading", font=("Helvetica", 18, "bold"))
+        style.configure("Treeview", rowheight=40)
+
+        # Set column widths
+        self.table.column("Description", width=400, anchor=ctk.CENTER)
+        self.table.column("Date", width=300, anchor=ctk.CENTER)
+        self.table.column("Amount", width=200, anchor=ctk.CENTER)
+
+        # Set column headings
+        self.table.heading("Description", text="Description")
+        self.table.heading("Date", text="Date")
+        self.table.heading("Amount", text="Amount")
+        
+
+        # Add transactions to the table
+        transaction_history = self.current_user["transaction_history"]
+        for transaction in transaction_history:
+            self.table.insert("", "end", values=(transaction[0], transaction[1], f"{transaction[2]:,.2f} Baht"))
+
+        # Buttons
+        button_frame = ctk.CTkFrame(master, fg_color="transparent")
+        button_frame.pack(pady=10)
+
+        back_button = ctk.CTkButton(button_frame, text="Back to Menu", command=self.go_back, width=300, height=30)
+        back_button.grid(row=0, column=0, padx=10)
+
+        print_button = ctk.CTkButton(button_frame, text="Print Transaction History", command=lambda: utils.print_transaction_history(self.current_user), width=300, height=30)
+        print_button.grid(row=0, column=1, padx=10)
+
+    def go_back(self):
+        self.master.destroy()
+        self.parent.deiconify()
+
+

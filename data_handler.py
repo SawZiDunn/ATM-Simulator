@@ -38,9 +38,3 @@ class DataHandler:
 
     def refresh_customers(self):
         self._customers = self.load_data(DATA_FILE)
-
-db = DataHandler()
-db.refresh_customers()
-for i in db.get_customers():
-
-    print(i )

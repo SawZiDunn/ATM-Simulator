@@ -18,7 +18,7 @@ def print_balance_slip(current_user):
                     output_file.write("----------------\n\n")
                     output_file.write(f"Name: {current_user["f_name"]} {current_user["l_name"]}\n\n")
                     output_file.write(f"Account Number: {current_user["account_no"]}\n\n")
-                    output_file.write(f"Balance: {current_user["amount"]}\n\n")
+                    output_file.write(f"Balance: {current_user["amount"]} Baht\n\n")
                     output_file.write(f"Date: {get_current_time()}")
 
             except Exception as e:
@@ -38,8 +38,8 @@ def print_transfer_slip(current_user, recipient, amount):
                     output_file.write(f"Sender Account Number: {current_user["account_no"]}\n\n")
                     output_file.write(f"Recipient: {recipient["f_name"]} {recipient["l_name"]}\n\n")
                     output_file.write(f"Recipient Account Number: {recipient["account_no"]}\n\n")
-                    output_file.write(f"Amount: {amount}\n\n")
-                    output_file.write(f"Balance: {current_user["amount"]}\n\n")
+                    output_file.write(f"Amount: {amount} Baht\n\n")
+                    output_file.write(f"Balance: {current_user["amount"]} Baht\n\n")
                     output_file.write(f"Date: {get_current_time()}")
 
             except Exception as e:
@@ -55,11 +55,11 @@ def print_deposit_slip(current_user, amount):
                 with open(file_path, "w") as output_file:
                     output_file.write("Receipt\n")
                     output_file.write("----------------\n\n")
-                    output_file.write(f"Transaction: Withdrawal\n\n")
+                    output_file.write(f"Transaction: Deposit\n\n")
                     output_file.write(f"Name: {current_user["f_name"]} {current_user["l_name"]}\n\n")
                     output_file.write(f"Account Number: {current_user["account_no"]}\n\n")
-                    output_file.write(f"Amount: {amount}\n\n")
-                    output_file.write(f"Balance: {current_user["amount"]}\n\n")
+                    output_file.write(f"Amount: {amount} Baht\n\n")
+                    output_file.write(f"Balance: {current_user["amount"]} Baht\n\n")
                     output_file.write(f"Date: {get_current_time()}")
 
             except Exception as e:
@@ -78,8 +78,8 @@ def print_withdrawal_slip(current_user, amount):
                     output_file.write(f"Transaction: Withdrawal\n\n")
                     output_file.write(f"Name: {current_user["f_name"]} {current_user["l_name"]}\n\n")
                     output_file.write(f"Account Number: {current_user["account_no"]}\n\n")
-                    output_file.write(f"Amount: {amount}\n\n")
-                    output_file.write(f"Balance: {current_user["amount"]}\n\n")
+                    output_file.write(f"Amount: {amount} Baht\n\n")
+                    output_file.write(f"Balance: {current_user["amount"]} Baht\n\n")
                     output_file.write(f"Date: {get_current_time()}")
 
             except Exception as e:
@@ -93,23 +93,23 @@ def print_transaction_history(current_user):
      if file_path:
         try:
             with open(file_path, "w") as output_file:
-                # Header
+            
                 output_file.write("Transaction History\n")
-                output_file.write("=" * 50 + "\n\n")
+                output_file.write("=" * 110 + "\n\n")  # Adjusted for longer width
                 output_file.write(f"Name: {current_user['f_name']} {current_user['l_name']}\n")
                 output_file.write(f"Account Number: {current_user['account_no']}\n\n")
                 
-                # Column Titles
-                output_file.write(f"{'Date':<20}{'Description':<20}{'Amount':>10}\n")
-                output_file.write("-" * 50 + "\n")
+            
+                output_file.write(f"{'Date':<30}{'Description':<30}{'Amount':>20}     \n")
+                output_file.write("-" * 110 + "\n")
                 
-                # Transaction History
+     
                 for each in current_user["transaction_history"]:
                     date, description, amount = each[1], each[0], each[2]
-                    output_file.write(f"{date:<20}{description:<20}{amount:>10.2f}\n")
+                    output_file.write(f"{date:<30}{description:<30}{amount:>20.2f} Baht\n")
                 
-                # Success message (Optional for internal use)
+            
                 print("Transaction history saved successfully!")
-
+        
         except Exception as e:
             print(f"An error occurred: {e}")

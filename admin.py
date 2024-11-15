@@ -142,13 +142,13 @@ class RegisterCustomer(BasePage):
 
             messagebox.showerror("Password Exists!", message="Current password already exists.")
         
-        if self.password.get() and self.f_name.get() and self.l_name.get():
+        elif self.password.get() and self.f_name.get() and self.l_name.get():
 
-            new_customer = {"account_no": self.account_no.get(), "password": self.password.get(), "f_name": self.f_name.get(), "l_name": self.l_name.get(), "amount": self.amount.get(), "transaction_history": list(), "status": True}
+            new_customer = {"account_no": self.account_no.get(), "password": self.password.get(), "f_name": self.f_name.get().upper(), "l_name": self.l_name.get().upper(), "amount": self.amount.get(), "transaction_history": list(), "status": True}
             self.db.append(new_customer)
             self.data_handler.save_data(self.db)
 
-            messagebox.showinfo(message="A new customer is registered succesfully!")
+            messagebox.showinfo("Customer Registered!", message="A new customer is registered succesfully!")
             self.main_menu()
         else:
             messagebox.showerror("Empty Field Exists!", message="Please fill all the empty fields.")
@@ -177,7 +177,7 @@ class ViewCustomer(BasePage):
         style = ttk.Style()
         style.configure("Treeview", font=("Helvetica", 17), rowheight=30)  # Set row font size and height
         style.configure("Treeview.Heading", font=("Helvetica", 18, "bold"))
-        style.configure("Treeview", rowheight=40)
+        style.configure("Treeview", rowheight=80)
 
         self.tree = ttk.Treeview(self.list_frame, columns=headers, show='headings', height=10, yscrollcommand=scrollbar.set)
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -277,7 +277,7 @@ class ViewCustomer(BasePage):
         save_btn.grid(row=6, column=0, columnspan=2, pady=20)
 
     def save_changes(self, row_id, password, f_name, l_name, amount, status, edit_window):
-        """Save edited customer data."""
+  
         customer_data = self.tree.item(row_id)["values"]
         account_no = str(customer_data[1]) # convert acc_no to str
         db = self.data_handler.get_customers()
@@ -295,21 +295,18 @@ class ViewCustomer(BasePage):
         messagebox.showinfo("Success", "Customer updated successfully!")
 
     def confirm_delete(self, row_id):
-        """Prompt to confirm deletion."""
         customer_data = self.tree.item(row_id)["values"]
         account_no = str(customer_data[1]) # convert acc_no to str
 
-        if messagebox.askyesno('Delete', f'Confirm delete account {account_no}?'):
+        if messagebox.askyesno('Delete Account', f'Confirm to delete account number {account_no}?'):
             db = self.data_handler.get_customers()
-           
             db = [customer for customer in db if customer["account_no"] != account_no]
      
             self.data_handler.save_data(db)
             self.refresh_customers()
-            messagebox.showinfo("Deleted", f"Customer {account_no} deleted successfully.")
+            messagebox.showinfo("Deleted", f"Account Number '{account_no}' deleted successfully.")
 
     def main_menu(self):
-        """Return to the main menu."""
         self.master.destroy()
         self.master.master.deiconify()
 
