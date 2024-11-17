@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from customer import LoginPage
-
+     
 class ATM:
     def __init__(self) -> None:
         self.root = ctk.CTk()

@@ -6,6 +6,7 @@ from customer import BasePage
 from data_handler import DataHandler
 import config
 import random
+import utils
 
 
 class AdminLoginPage(BasePage):
@@ -15,7 +16,7 @@ class AdminLoginPage(BasePage):
         self.email = ctk.StringVar()
         self.password = ctk.StringVar()
 
-        self.instruction = ctk.CTkLabel(master, text="Please enter admin email and password!", font=("Helvetica", 25))
+        self.instruction = ctk.CTkLabel(master, text="Please enter admin email and password!", font=("Helvetica", 25), text_color="red")
         self.instruction.pack(pady=25)
 
         self.input_frame = ctk.CTkFrame(master, fg_color="transparent")
@@ -54,7 +55,7 @@ class AdminMenu(BasePage):
         self.db = db
         self.data_handler = data_handler
 
-        self.instruction = ctk.CTkLabel(master, text="Please make a selection!", font=("Helvetica", 25))
+        self.instruction = ctk.CTkLabel(master, text="Please make a selection!", font=("Helvetica", 25), text_color="red")
         self.instruction.pack(pady=25)
 
         self.button_frame = ctk.CTkFrame(master, fg_color="transparent")
@@ -96,7 +97,7 @@ class RegisterCustomer(BasePage):
         self.l_name = ctk.StringVar()
         self.amount = ctk.DoubleVar()
 
-        self.instruction = ctk.CTkLabel(master, text="Please fill customer details!", font=("Helvetica", 25))
+        self.instruction = ctk.CTkLabel(master, text="Please fill customer details!", font=("Helvetica", 25), text_color="red")
         self.instruction.pack(pady=25)
 
         # frame to hold inputs
@@ -150,6 +151,8 @@ class RegisterCustomer(BasePage):
 
             messagebox.showinfo("Customer Registered!", message="A new customer is registered succesfully!")
             self.main_menu()
+                
+
         else:
             messagebox.showerror("Empty Field Exists!", message="Please fill all the empty fields.")
 
@@ -165,11 +168,12 @@ class ViewCustomer(BasePage):
 
         headers = ["NO", "Account Number", "Password", "First Name", "Last Name", "Amount", "Status", "Actions"]
 
-        self.topic = ctk.CTkLabel(master, text="Customer Management", font=("Helvetica", 25))
+        self.topic = ctk.CTkLabel(master, text="Customer Management", font=("Helvetica", 28, "bold"), text_color="red")
         self.topic.pack(pady=25)
 
-        self.list_frame = ctk.CTkFrame(master, width=1200)
+        self.list_frame = ctk.CTkFrame(master, width=1200, height=400)
         self.list_frame.pack(pady=10, padx=10)
+        self.list_frame.pack_propagate(False)
 
         scrollbar = ttk.Scrollbar(self.list_frame, orient=tk.VERTICAL)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -210,7 +214,7 @@ class ViewCustomer(BasePage):
     def load_customers(self):
      
         self.data_handler.refresh_customers()
-        customers = self.data_handler.get_customers()
+        customers = self.data_handler.get_customers()[::-1]
 
         for index, customer in enumerate(customers, start=1):
             status = "Active" if customer["status"] else "Locked"

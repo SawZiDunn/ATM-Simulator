@@ -1,2 +1,2 @@
-ADMIN_EMAIL = "123"
-ADMIN_PASSWORD = "123"
+ADMIN_EMAIL = "admin@gmail.com"
+ADMIN_PASSWORD = "admin"
