@@ -20,17 +20,16 @@ class DataHandler:
             return []
 
     def get_customers(self):
+        self.refresh_customers()
         return self._customers
     
     def password_exists(self, password):
-        self.refresh_customers()
         for i in self.get_customers():
             if i["password"] == password:
                 return True
         return False
 
     def username_exists(self, f_name, l_name):
-        self.refresh_customers()
         for i in self.get_customers():
             if i["f_name"] == f_name.upper() and i["l_name"] == l_name.upper():
                 return True

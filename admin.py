@@ -6,7 +6,6 @@ from customer import BasePage
 from data_handler import DataHandler
 import config
 import random
-import utils
 
 
 class AdminLoginPage(BasePage):
@@ -167,40 +166,45 @@ class ViewCustomer(BasePage):
         self.data_handler = data_handler
 
         headers = ["NO", "Account Number", "Password", "First Name", "Last Name", "Amount", "Status", "Actions"]
-
         self.topic = ctk.CTkLabel(master, text="Customer Management", font=("Helvetica", 28, "bold"), text_color="red")
         self.topic.pack(pady=25)
 
-        self.list_frame = ctk.CTkFrame(master, width=1200, height=400)
-        self.list_frame.pack(pady=10, padx=10)
-        self.list_frame.pack_propagate(False)
+        if self.data_handler.get_customers():
 
-        scrollbar = ttk.Scrollbar(self.list_frame, orient=tk.VERTICAL)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            self.list_frame = ctk.CTkFrame(master, width=1200, height=400)
+            self.list_frame.pack(pady=10, padx=10)
+            self.list_frame.pack_propagate(False)
 
-        style = ttk.Style()
-        style.configure("Treeview", font=("Helvetica", 17), rowheight=30)  # Set row font size and height
-        style.configure("Treeview.Heading", font=("Helvetica", 18, "bold"))
-        style.configure("Treeview", rowheight=80)
+            scrollbar = ttk.Scrollbar(self.list_frame, orient=tk.VERTICAL)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.tree = ttk.Treeview(self.list_frame, columns=headers, show='headings', height=10, yscrollcommand=scrollbar.set)
-        self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+            style = ttk.Style()
+            style.configure("Treeview", font=("Helvetica", 17), rowheight=30)  # Set row font size and height
+            style.configure("Treeview.Heading", font=("Helvetica", 18, "bold"))
+            style.configure("Treeview", rowheight=80)
 
-        for header in headers:
-            self.tree.heading(header, text=header)
-            self.tree.column(header, width=100, anchor=tk.CENTER)
+            self.tree = ttk.Treeview(self.list_frame, columns=headers, show='headings', height=10, yscrollcommand=scrollbar.set)
+            self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        self.tree.column("Account Number", width=200)
-        self.tree.column("Password", width=150)
-        self.tree.column("First Name", width=150)
-        self.tree.column("Last Name", width=150)
-        self.tree.column("Amount", width=150)
-        self.tree.column("Status", width=150)
-        self.tree.column("Actions", width=180)
+            for header in headers:
+                self.tree.heading(header, text=header)
+                self.tree.column(header, width=100, anchor=tk.CENTER)
 
-        self.tree.bind("<Button-1>", self.handle_click)  # Handle clicks on action links
+            self.tree.column("Account Number", width=200)
+            self.tree.column("Password", width=150)
+            self.tree.column("First Name", width=150)
+            self.tree.column("Last Name", width=150)
+            self.tree.column("Amount", width=150)
+            self.tree.column("Status", width=150)
+            self.tree.column("Actions", width=180)
 
-        self.load_customers()
+            self.tree.bind("<Button-1>", self.handle_click)  # Handle clicks on action links
+
+            self.refresh_and_load_customers()
+
+        else:
+            self.empty_label = ctk.CTkLabel(master, text="No Customer!", font=("Helvetica", 28, "bold"), text_color="red")
+            self.empty_label.pack(pady=25)
 
         button_frame = ctk.CTkFrame(master, fg_color="transparent")
         button_frame.pack(pady=10)
@@ -208,12 +212,11 @@ class ViewCustomer(BasePage):
         return_btn = ctk.CTkButton(button_frame, text="Back", width=300, height=40, font=("Helvetica", 18), command=self.main_menu)
         return_btn.pack(side=tk.LEFT, padx=10)
 
-        refresh_btn = ctk.CTkButton(button_frame, text="Refresh", width=300, height=40, font=("Helvetica", 18), command=self.refresh_customers)
+        refresh_btn = ctk.CTkButton(button_frame, text="Refresh", width=300, height=40, font=("Helvetica", 18), command=self.refresh_and_load_customers)
         refresh_btn.pack(side=tk.LEFT, padx=10)
 
-    def load_customers(self):
-     
-        self.data_handler.refresh_customers()
+    def refresh_and_load_customers(self):
+        self.tree.delete(*self.tree.get_children())
         customers = self.data_handler.get_customers()[::-1]
 
         for index, customer in enumerate(customers, start=1):
@@ -222,7 +225,6 @@ class ViewCustomer(BasePage):
             self.tree.insert('', tk.END, values=values)
 
     def handle_click(self, event):
-   
         region = self.tree.identify("region", event.x, event.y)
         if region == "cell":
             col = int(self.tree.identify_column(event.x).replace("#", ""))
@@ -236,12 +238,6 @@ class ViewCustomer(BasePage):
         action_popup.add_command(label="Edit", command=lambda: self.edit_customer(row_id), font=font_style)
         action_popup.add_command(label="Delete", command=lambda: self.confirm_delete(row_id), font=font_style)
         action_popup.post(self.tree.winfo_pointerx(), self.tree.winfo_pointery())
-
-    def refresh_customers(self):
-
-        self.data_handler.refresh_customers()
-        self.tree.delete(*self.tree.get_children())
-        self.load_customers()
 
     def edit_customer(self, row_id):
         customer_data = self.tree.item(row_id)["values"]
@@ -270,7 +266,7 @@ class ViewCustomer(BasePage):
         last_entry.grid(row=3, column=1)
 
         ctk.CTkLabel(edit_window, text="Amount").grid(row=4, column=0, pady=5)
-        amount_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=amount), width=200)
+        amount_entry = ctk.CTkEntry(edit_window, textvariable=tk.StringVar(value=amount), width=200, state="disabled")
         amount_entry.grid(row=4, column=1)
 
         ctk.CTkLabel(edit_window, text="Status").grid(row=5, column=0, pady=5)
@@ -294,7 +290,7 @@ class ViewCustomer(BasePage):
                 customer["amount"] = float(amount)
                 customer["status"] = status
         self.data_handler.save_data(db)
-        self.refresh_customers()
+        self.refresh_and_load_customers()
         edit_window.destroy()
         messagebox.showinfo("Success", "Customer updated successfully!")
 
@@ -307,7 +303,7 @@ class ViewCustomer(BasePage):
             db = [customer for customer in db if customer["account_no"] != account_no]
      
             self.data_handler.save_data(db)
-            self.refresh_customers()
+            self.refresh_and_load_customers()
             messagebox.showinfo("Deleted", f"Account Number '{account_no}' deleted successfully.")
 
     def main_menu(self):

@@ -181,38 +181,42 @@ class TransactionHistory(BasePage):
         title_label = ctk.CTkLabel(master, text="Transaction History", font=("Arial", 25, "bold"))
         title_label.pack(pady=20)
 
-        # Scrollable table for transaction list
-        self.table_frame = ctk.CTkFrame(master, width=1200, height=400)
-        self.table_frame.pack(padx=10, pady=10)
-        self.table_frame.pack_propagate(False)
+        if current_user["transaction_history"]:
+            # Scrollable table for transaction list
+            self.table_frame = ctk.CTkFrame(master, width=1200, height=400)
+            self.table_frame.pack(padx=10, pady=10)
+            self.table_frame.pack_propagate(False)
 
-        # Add scrollbars
-        self.scrollbar = ttk.Scrollbar(self.table_frame, orient=ctk.VERTICAL)
-        self.scrollbar.pack(side=ctk.RIGHT, fill=ctk.Y)
+            # Add scrollbars
+            self.scrollbar = ttk.Scrollbar(self.table_frame, orient=ctk.VERTICAL)
+            self.scrollbar.pack(side=ctk.RIGHT, fill=ctk.Y)
 
-        self.table = ttk.Treeview(self.table_frame, columns=("Description", "Date", "Amount"), show="headings", height=10, yscrollcommand=self.scrollbar.set)
-        self.table.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
-        self.table.configure(yscrollcommand=self.scrollbar.set)
+            self.table = ttk.Treeview(self.table_frame, columns=("Description", "Date", "Amount"), show="headings", height=10, yscrollcommand=self.scrollbar.set)
+            self.table.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True)
+            self.table.configure(yscrollcommand=self.scrollbar.set)
 
-        style = ttk.Style()
-        style.configure("Treeview", font=("Helvetica", 17), rowheight=70)  # Set row font size and height
-        style.configure("Treeview.Heading", font=("Helvetica", 18, "bold"))
-        style.configure("Treeview", rowheight=60)
+            style = ttk.Style()
+            style.configure("Treeview", font=("Helvetica", 17), rowheight=70)  # Set row font size and height
+            style.configure("Treeview.Heading", font=("Helvetica", 18, "bold"))
+            style.configure("Treeview", rowheight=60)
 
-        # defining column widths
-        self.table.column("Description", width=400, anchor=ctk.CENTER)
-        self.table.column("Date", width=300, anchor=ctk.CENTER)
-        self.table.column("Amount", width=200, anchor=ctk.CENTER)
+            # defining column widths
+            self.table.column("Description", width=400, anchor=ctk.CENTER)
+            self.table.column("Date", width=300, anchor=ctk.CENTER)
+            self.table.column("Amount", width=200, anchor=ctk.CENTER)
 
-        # defining column headings
-        self.table.heading("Description", text="Description")
-        self.table.heading("Date", text="Date")
-        self.table.heading("Amount", text="Amount")
+            # defining column headings
+            self.table.heading("Description", text="Description")
+            self.table.heading("Date", text="Date")
+            self.table.heading("Amount", text="Amount")
 
-        # Add transactions to the table with the most recent one at the top
-        transaction_history = self.current_user["transaction_history"][::-1]
-        for transaction in transaction_history:
-            self.table.insert("", "end", values=(transaction[0], transaction[1], f"{transaction[2]:,.2f} Baht"))
+            # Add transactions to the table with the most recent one at the top
+            transaction_history = self.current_user["transaction_history"][::-1]
+            for transaction in transaction_history:
+                self.table.insert("", "end", values=(transaction[0], transaction[1], f"{transaction[2]:,.2f} Baht"))
+        else:
+            initial_label = ctk.CTkLabel(master, text="No Transaction History!", font=("Arial", 18, "bold"), text_color="red")
+            initial_label.pack(pady=20)
 
         # frame to hold buttons
         button_frame = ctk.CTkFrame(master, fg_color="transparent")

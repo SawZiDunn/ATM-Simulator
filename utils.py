@@ -127,5 +127,5 @@ def validate_amount(amount):
             raise ValueError("Amount must be positive.")
         return value
     except ValueError as e:
-        messagebox.showerror("Invalid Amount", str(e))
+        messagebox.showerror("Invalid Amount", "Please provide a valid number!")
         return None
