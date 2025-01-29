@@ -2,8 +2,12 @@
 
 ## Project Overview
 
-‘Simple ATM Simulator’ is a secure and efficient simulation of a real Automatic Teller Machine (ATM) system, designed using Python's Tkinter module for the graphical user interface (GUI) and the pickle module for smooth data management. The application supports two distinct user roles: Admin and Customer. Admin can register new customers and manage existing accounts, while customers can carry out various banking operations such as transferring funds, withdrawing money, and viewing transaction history slips.
-This project utilizes Python’s object-oriented programming (OOP) principles, including inheritance and composition, to structure the application efficiently. Different screens are encapsulated within dedicated classes such as UserMenu, Transfer, and TransactionHistory, enabling smooth transitions between them and improving both usability and code maintainability.
+‘Simple ATM Simulator’ is a secure and efficient simulation of a real Automatic Teller Machine (ATM) system, designed using Python's Tkinter module for the graphical user interface (GUI) and the pickle module for smooth data management.
+
+The application supports two distinct user roles: **Admin** and **Customer**.
+Admin can register new customers and manage existing accounts, while customers can carry out various banking operations such as transferring funds, withdrawing money, and viewing transaction history slips.
+
+This project utilizes Python’s object-oriented programming (OOP) principles, including **inheritance** and **composition**, to structure the application efficiently. Different screens are encapsulated within dedicated classes such as **UserMenu, Transfer, and TransactionHistory**, enabling smooth transitions between them and improving both usability and code maintainability.
 
 Admin email and password is hardcoded in 'config.py'.
 
