@@ -13,13 +13,19 @@ Admin email and password is hardcoded in 'config.py'.
 
 ![Menu Page](./imgs/no1.png)
 
-![Customer Management](./imgs/no2.png)
+![Register a new customer](./imgs/no2.png)
+
+![Customer Management](./imgs/no3.png)
 
 ### Customer Views
 
-![Menu Page](./imgs/no3.png)
+![Log In](./imgs/no4.png)
 
-![Transaction History](./imgs/no4.png)
+![Menu Page](./imgs/no5.png)
+
+![Transfer](./imgs/no6.png)
+
+![Transaction History](./imgs/no7.png)
 
 ## Key Features
 
@@ -30,7 +36,7 @@ Admin email and password is hardcoded in 'config.py'.
 -   Account Management: Lock and unlock customer accounts, rendering inactive accounts unable to perform any banking operations.
 -   Edit Customer Information: Update personal details such as first name, last name, and password. (Account number and balance are immutable.)
 
-## Customer Role:
+### Customer Role:
 
 -   Banking Operations: Check account balance, deposit funds, withdraw money, and transfer funds between accounts.
 -   Receipt Printing: Optionally generate receipts after deposits, withdrawals, or transfers, saved in ‘.txt’ format.

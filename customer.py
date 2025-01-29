@@ -5,7 +5,7 @@ from data_handler import DataHandler
 import sys
 from transaction import BasePage, Transfer, Deposit, Withdraw
 
-
+ 
 class LoginPage(BasePage):
     def __init__(self, master):
         super().__init__(master, "ATM Login")
@@ -210,10 +210,17 @@ class TransactionHistory(BasePage):
             self.table.heading("Date", text="Date")
             self.table.heading("Amount", text="Amount")
 
+            # Define row styles for positive and negative transactions
+            self.table.tag_configure("positive", foreground="green")
+            self.table.tag_configure("negative", foreground="red")
+
             # Add transactions to the table with the most recent one at the top
             transaction_history = self.current_user["transaction_history"][::-1]
             for transaction in transaction_history:
-                self.table.insert("", "end", values=(transaction[0], transaction[1], f"{transaction[2]:,.2f} Baht"))
+                description, date, amount = transaction
+                formatted_amount = f"+{amount:,.2f} Baht" if amount >= 0 else f"{amount:,.2f} Baht"
+                tag = "positive" if amount >= 0 else "negative"
+                self.table.insert("", "end", values=(description, date, formatted_amount), tags=(tag,))
         else:
             initial_label = ctk.CTkLabel(master, text="No Transaction History!", font=("Arial", 18, "bold"), text_color="red")
             initial_label.pack(pady=20)

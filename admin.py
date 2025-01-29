@@ -6,6 +6,7 @@ from customer import BasePage
 from data_handler import DataHandler
 import config
 import random
+import utils
 
 
 class AdminLoginPage(BasePage):
@@ -144,12 +145,16 @@ class RegisterCustomer(BasePage):
         
         elif self.password.get() and self.f_name.get() and self.l_name.get():
 
-            new_customer = {"account_no": self.account_no.get(), "password": self.password.get(), "f_name": self.f_name.get().upper(), "l_name": self.l_name.get().upper(), "amount": self.amount.get(), "transaction_history": list(), "status": True}
-            self.db.append(new_customer)
-            self.data_handler.save_data(self.db)
+            if utils.validate_amount(self.amount.get()):
 
-            messagebox.showinfo("Customer Registered!", message="A new customer is registered succesfully!")
-            self.main_menu()
+
+                new_customer = {"account_no": self.account_no.get(), "password": self.password.get(), "f_name": self.f_name.get().upper(), "l_name": self.l_name.get().upper(), "amount": self.amount.get(), "transaction_history": list(), "status": True}
+                self.db.append(new_customer)
+                self.data_handler.save_data(self.db)
+
+                messagebox.showinfo("Customer Registered!", message="A new customer is registered succesfully!")
+                self.main_menu()
+            return
                 
 
         else:
@@ -183,7 +188,7 @@ class ViewCustomer(BasePage):
             style.configure("Treeview.Heading", font=("Helvetica", 18, "bold"))
             style.configure("Treeview", rowheight=80)
 
-            self.tree = ttk.Treeview(self.list_frame, columns=headers, show='headings', height=10, yscrollcommand=scrollbar.set)
+            self.tree = ttk.Treeview(self.list_frame, columns=headers, show='headings', height=15, yscrollcommand=scrollbar.set)
             self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
             for header in headers:
@@ -216,13 +221,18 @@ class ViewCustomer(BasePage):
         refresh_btn.pack(side=tk.LEFT, padx=10)
 
     def refresh_and_load_customers(self):
-        self.tree.delete(*self.tree.get_children())
-        customers = self.data_handler.get_customers()[::-1]
+        self.tree.delete(*self.tree.get_children())  # Clear existing rows
+        customers = self.data_handler.get_customers()[::-1]  # Reverse order for latest customers first
+
+        self.tree.tag_configure("locked", background="white", foreground="red")  # Locked account style
+        self.tree.tag_configure("active", background="white", foreground="black")  # Active account style
 
         for index, customer in enumerate(customers, start=1):
             status = "Active" if customer["status"] else "Locked"
-            values = (index, customer["account_no"], customer["password"], customer["f_name"], customer["l_name"], customer["amount"], status, "Edit | Delete")
-            self.tree.insert('', tk.END, values=values)
+            tag = "active" if customer["status"] else "locked"  # Assign tag based on status
+            values = (index, customer["account_no"], customer["password"], customer["f_name"].upper(),
+                    customer["l_name"].upper(), customer["amount"], status, "Edit | Delete")
+            self.tree.insert('', tk.END, values=values, tags=(tag,))
 
     def handle_click(self, event):
         region = self.tree.identify("region", event.x, event.y)
@@ -285,8 +295,8 @@ class ViewCustomer(BasePage):
         for customer in db:
             if customer["account_no"] == account_no:
                 customer["password"] = password
-                customer["f_name"] = f_name
-                customer["l_name"] = l_name
+                customer["f_name"] = f_name.upper()
+                customer["l_name"] = l_name.upper()
                 customer["amount"] = float(amount)
                 customer["status"] = status
         self.data_handler.save_data(db)
